@@ -1,6 +1,6 @@
 package com.system.model;
 
-import com.system.common.FileUtils;
+import com.system.utils.FileUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,6 +18,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class Disk extends Observable {
 
+    //TODO 更灵活的读取和写入磁盘方式
     private static final long serialVersionUID = 1L;
 
     /*    1、分配内存空间
@@ -93,7 +94,7 @@ public class Disk extends Observable {
             }
         }
         initializeFAT();
-        persistDisk(file);
+        persistDisk();
     }
     /**
      * 初始化FAT文件分配表
@@ -117,10 +118,10 @@ public class Disk extends Observable {
         notifyObservers();
     }
     /**
-     * 将space的数据持久化到一个文件中
-     * @param file
+     * 将space的数据持久化到文件中
      */
-    public void persistDisk(File file) {
+    public void persistDisk() {
+        File file = new File(FILE_PATH);
         try {
             FileUtils.saveBytes(space, file);
         } catch (IOException e) {
@@ -145,13 +146,52 @@ public class Disk extends Observable {
      * @param i 索引值
      * @return 磁盘块的复制，避免外部直接操纵磁盘
      */
-    private byte[] getBlock(int i){
-        // 不能获取文件分配表、不能超出范围
-        if(i < 2 || i > BLOCK_SIZE){
-            throw new RuntimeException("获取磁盘快错误");
+    public byte[] readBlock(int i){
+        if(i > BLOCK_NUM){
+            throw new IndexOutOfBoundsException("index error");
         }
         // 传回去一个复制了的数组，避免外部直接操纵磁盘的数组
-        return Arrays.copyOf(space[i], space[i].length);
+        readLock.lock();
+        try{
+            return Arrays.copyOf(space[i], space[i].length);
+        }finally {
+            readLock.unlock();
+        }
+    }
+    /**
+     * 写一个磁盘块
+     * @param i 索引值
+     * @param bytes 要写入的内容
+     */
+    public void writeBlock(int i, byte[] bytes){
+        if(i > BLOCK_NUM || bytes.length > BLOCK_SIZE){
+            throw new IndexOutOfBoundsException("index error");
+        }
+        writeLock.lock();
+        try{
+            // 避免外部的数组直接操纵磁盘
+            space[i] = Arrays.copyOf(bytes, bytes.length);
+            // 通知观察者，磁盘变化
+            notifyObserver();
+        }finally {
+            writeLock.unlock();
+        }
+    }
+
+    public static int getBlockSize() {
+        return BLOCK_SIZE;
+    }
+
+    public static int getBlockNum() {
+        return BLOCK_NUM;
+    }
+
+    public static byte getEndFileMark() {
+        return END_FILE_MARK;
+    }
+
+    public static byte getUSABLE() {
+        return USABLE;
     }
 
     public static void main(String[] args) throws FileNotFoundException {

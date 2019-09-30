@@ -1,4 +1,4 @@
-package com.system.common;
+package com.system.utils;
 
 import com.system.exception.DiskCapacityErrorException;
 import sun.jvm.hotspot.runtime.Bytes;
