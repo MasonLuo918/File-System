@@ -1,5 +1,7 @@
 package com.system.model;
 
+import com.system.utils.PersistThreadPool;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
@@ -29,9 +31,6 @@ public class FAT {
     // 维护一个空闲块列表
     private LinkedList<Integer> emptyBlockIndexList = new LinkedList<>();
 
-    // 操作fat的次数,如果够20次，就保存进磁盘中
-    private volatile int count = 0;
-
     // 线程池
     private ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -60,7 +59,7 @@ public class FAT {
      * @return 如果磁盘块还没有满，则返回可分配的索引号，否则，返回-1
      */
     public int allocation(int lastBlockIndex){
-        if(lastBlockIndex < 2 || lastBlockIndex > table.length){
+        if(lastBlockIndex > table.length){
             throw new RuntimeException("index error");
         }
         int index;
@@ -71,7 +70,6 @@ public class FAT {
             }
             index = emptyBlockIndexList.removeFirst();
             table[lastBlockIndex] = (byte) index;
-            count++;
             persistFAT();
             return index;
         }
@@ -81,7 +79,15 @@ public class FAT {
      * @return 可分配的磁盘块的下标
      */
     public int allocation(){
-        return allocation(-1);
+        synchronized (FAT.class){
+            if(emptyBlockIndexList.isEmpty()){
+                return -1;
+            }
+            int index = emptyBlockIndexList.removeFirst();
+            table[index] = -1;
+            persistFAT();
+            return index;
+        }
     }
     /**
      * 回收一个块
@@ -95,7 +101,6 @@ public class FAT {
             if(table[blockIndex] != 0){
                 table[blockIndex] = 0;
                 emptyBlockIndexList.addLast(blockIndex);
-                count++;
                 persistFAT();
             }
         }
@@ -118,10 +123,7 @@ public class FAT {
      * 持久化FAT入磁盘，使得数组能够及时同步到磁盘中
      */
     private void persistFAT(){
-        if(count % 20 == 0){
-            executor.execute(new Worker());
-        }
-        count = 0;
+        PersistThreadPool.submit(new Worker());
     }
     /**
      * 初始化一个空闲块队列

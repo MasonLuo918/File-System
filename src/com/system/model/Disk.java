@@ -1,6 +1,8 @@
 package com.system.model;
 
 import com.system.common.observer.DiskObserver;
+import com.system.entity.Entry;
+import com.system.entity.FolderEntry;
 import com.system.utils.FileUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,16 +36,21 @@ public class Disk extends Observable {
     private static final String FILE_PATH = "Disk.disk";
 
     // 磁盘块的大小
-    private static final int BLOCK_SIZE = 64;
+    public static final int BLOCK_SIZE = 64;
 
     // 磁盘块的个数
-    private static final int BLOCK_NUM = 128;
+    public static final int BLOCK_NUM = 128;
+
+    // 根目录盘块号
+    public static final int ROOT_FOLDER_INDEX = 2;
 
     // 文件结束辨识符号
     private static final byte END_FILE_MARK = (byte) 255;
 
     // 物理快可使用标识符
     private static final byte USABLE = (byte) 0;
+
+    private static FolderEntry rootEntry;
 
     // 磁盘实际存储空间，默认为128个块，每个块大小为64B
     private byte[][] space;
@@ -53,12 +60,22 @@ public class Disk extends Observable {
         // 如果磁盘文件为空，说明磁盘是首次使用，需要初始化
         if (file.length() == 0) {
             initializeDisk(file);
+            initialROOTFolder();
+        }else{
+            // 加载文件内容
+            loadDisk(file);
         }
-        // 加载文件内容
-        loadDisk(file);
         loadObserver();
         notifyObserver();
     }
+
+    private void initialROOTFolder() {
+        space[0][2] = END_FILE_MARK;
+        for(int i = 0; i < 8; i++){
+            space[ROOT_FOLDER_INDEX][i * 8] = '$';
+        }
+    }
+
     /**
      * @return 一个磁盘的实例
      */
@@ -224,16 +241,12 @@ public class Disk extends Observable {
         space[0][0] = END_FILE_MARK;
         space[0][1] = END_FILE_MARK;
     }
+    /**
+     * 加载观察者，实现线程保存
+     */
     private void loadObserver(){
         DiskObserver observer = new DiskObserver();
         addObserver(observer);
-    }
-    public static int getBlockSize() {
-        return BLOCK_SIZE;
-    }
-
-    public static int getBlockNum() {
-        return BLOCK_NUM;
     }
 
     public static byte getEndFileMark() {
@@ -245,6 +258,7 @@ public class Disk extends Observable {
     }
 
     public static void main(String[] args) throws FileNotFoundException {
-        Disk.getInstance();
+        Disk disk = Disk.getInstance();
+        System.out.println();
     }
 }
