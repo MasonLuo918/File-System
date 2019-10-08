@@ -4,42 +4,80 @@ import com.system.model.Disk;
 import com.system.model.FAT;
 import com.system.utils.PropertyUtils;
 
+/**
+ * 文件夹，将一个盘块读取成一个文件夹，方便操作
+ */
 public class Folder {
 
+    // 文件夹名字
     private String name;
 
+    // 读取的盘块索引
     private int blockIndex;
 
+    // 该盘块的目录项(根目录没有)
     private Entry myself;
 
+    // 该盘块的所有目录项
     private Entry[] entries = new Entry[8];
 
+    /**
+     * @param blockIndex 读取的盘块
+     * @param name 该目录的名字
+     */
     public Folder(int blockIndex, String name) {
         this.name = name;
         this.blockIndex = blockIndex;
         loadEntry(blockIndex);
+        // 默认设置成根目录entry
         myself = new FolderEntry();
+        myself.setName(name);
         myself.setNormal(true);
         myself.setFolder(true);
     }
 
+    /**
+     * @param folderEntry 该文件夹的目录项
+     */
     public Folder(FolderEntry folderEntry){
         this(folderEntry.getStartBlockIndex(), folderEntry.getName());
         myself = folderEntry;
     }
-
+    /**
+     * 创建一个文件夹
+     * @param name 文件名
+     * @return 创建成功返回文件加Entry，否则返回NULL
+     */
     public FolderEntry createFolder(String name){
         return createFolder(name, false);
     }
-
+    /**
+     * 创建一个文件夹
+     * @param name 文件名
+     * @param readOnly 文件夹属性，是否只读
+     * @return 创建成功返回文件加Entry，否则返回NULL
+     */
     public FolderEntry createFolder(String name, boolean readOnly){
         return createFolder(name, readOnly, false);
     }
-
+    /**
+     * 创建一个文件夹
+     * @param name 文件名
+     * @param readOnly 文件夹属性，是否只读
+     * @param system 文件夹属性，是否系统文件
+     * @return 创建成功返回文件加Entry，否则返回NULL
+     */
     public FolderEntry createFolder(String name, boolean readOnly, boolean system){
         return createFolder(name, readOnly, system, true);
     }
-
+    /**
+     * 创建一个文件夹
+     * @param name 文件名
+     * @param readOnly 文件夹属性，是否只读
+     * @param system 文件夹属性，是否系统文件
+     * @param normal 文件夹属性，是否普通文件
+     * @return 创建成功返回文件加Entry，否则返回NULL
+     */
     public FolderEntry createFolder(String name, boolean readOnly, boolean system, boolean normal){
         if(contain(name) || Full()){
             return null;
@@ -61,6 +99,10 @@ public class Folder {
         return folderEntry;
     }
 
+    /**
+     * 添加一个Entry，并且写入磁盘中
+     * @param entry 要添加的entry
+     */
     private void addEntry(Entry entry){
         int i;
         for(i = 0; i < entries.length; i++){
@@ -71,7 +113,10 @@ public class Folder {
         }
         Disk.getInstance().writeBlock(blockIndex, i * 8, i * 8 + 8, entry.toBytes());
     }
-
+    /**
+     * 初始化一个文件夹，将其目录项全部置空
+     * @param folderEntry 文件夹Entry
+     */
     private void initFolder(FolderEntry folderEntry){
         int index = folderEntry.getStartBlockIndex();
         byte[] blockData = new byte[64];
@@ -83,7 +128,11 @@ public class Folder {
         }
         Disk.getInstance().writeBlock(index, blockData);
     }
-
+    /**
+     * 获取一个指定名字的Entry
+     * @param name entry名字
+     * @return 对应的entry，如果不存在则返回null
+     */
     public Entry get(String name){
         for(Entry entry : entries){
             if(entry.getName().equals(name)){
@@ -92,7 +141,9 @@ public class Folder {
         }
         return null;
     }
-
+    /**
+     * 文件夹是否满了
+     */
     public boolean Full(){
         for(Entry entry : entries){
             if(entry == null){
@@ -101,7 +152,9 @@ public class Folder {
         }
         return true;
     }
-
+    /**
+     * 文件夹是否为空
+     */
     public boolean Empty(){
         for(Entry entry : entries){
             if(entry != null){
@@ -111,6 +164,11 @@ public class Folder {
         return true;
     }
 
+    /**
+     * 是否含有该文件
+     * @param name 文件entry名
+     * @return boolean
+     */
     public boolean contain(String name){
         for(Entry entry : entries){
             if(entry != null && entry.getName().equals(name)){
@@ -119,7 +177,10 @@ public class Folder {
         }
         return false;
     }
-
+    /**
+     * 加载一个文件夹
+     * @param index 盘块index
+     */
     private void loadEntry(int index) {
         Disk disk = Disk.getInstance();
         byte[] data = disk.readBlock(index);

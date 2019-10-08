@@ -3,18 +3,21 @@ package com.system.entity;
 import java.util.Arrays;
 
 public class FileEntry extends Entry {
-
+    // 文件长度
     private int length;
-
+    // 文件类型(后缀)
     private String type;
 
     public  FileEntry(){
 
     }
-
+    /**
+     * 将一个8字节的字节数组转换成Entry
+     * @param data 8字节的字节数组
+     */
     public FileEntry(byte[] data){
-        name = new String(Arrays.copyOfRange(data, 0,3 ));
-        type = new String(Arrays.copyOfRange(data, 3, 5));
+        name = new String(Arrays.copyOfRange(data, 0,3 )).trim();
+        type = new String(Arrays.copyOfRange(data, 3, 5)).trim();
         setProperty(data[5]);
         startBlockIndex = data[6];
         length = data[7];

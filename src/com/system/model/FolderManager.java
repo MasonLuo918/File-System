@@ -8,6 +8,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 public class FolderManager {
+    /**
+     * 创建一个文件夹
+     * @param path 文件夹父目录路径
+     * @param name 要创建的文件夹名称
+     * @return 成功创建则返回一个entry，否则返回null
+     */
     public FolderEntry createFolder(String path, String name){
         if(name.length() > 3){
             return null;
@@ -23,7 +29,14 @@ public class FolderManager {
         return createFolder(list, folder, name);
     }
 
+    /**
+     * @param parentList 分割后的父目录名称
+     * @param parent 父亲文件夹
+     * @param name 要创建的文件夹名称
+     * @return 成功创建则返回一个entry，否则返回null
+     */
     private FolderEntry createFolder(LinkedList<String> parentList, Folder parent, String name){
+        // 如果parentList不为空
        if(!parentList.isEmpty()){
            String nextParentName = parentList.removeFirst();
            if(!parent.contain(nextParentName)){
@@ -44,13 +57,5 @@ public class FolderManager {
            }
            return parent.createFolder(name);
        }
-    }
-
-    public static void main(String[] args) {
-        Disk disk = Disk.getInstance();
-        FAT fat = FAT.getInstance();
-        FolderManager folderManager = new FolderManager();
-        FolderEntry entry = folderManager.createFolder("/mys", "mys");
-        System.out.println(entry);
     }
 }

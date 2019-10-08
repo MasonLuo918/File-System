@@ -9,7 +9,7 @@ public class FolderEntry extends Entry {
     }
 
     public FolderEntry(byte[] data){
-        name = new String(Arrays.copyOfRange(data, 0,3 ));
+        name = new String(Arrays.copyOfRange(data, 0,3 )).trim();
         setProperty(data[5]);
         startBlockIndex = data[6];
     }
