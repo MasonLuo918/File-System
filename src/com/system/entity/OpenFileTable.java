@@ -1,0 +1,71 @@
+package com.system.entity;
+
+import com.sun.swing.internal.plaf.basic.resources.basic;
+
+public class OpenFileTable {
+    private String name;
+
+    private byte attribute;
+
+    private int number;
+
+    private int flag;
+
+    private Pointer read;
+
+    private Pointer write;
+
+    static class Pointer{
+        private int dnum;
+
+        private int bnum;
+
+        public int getDnum() {
+            return dnum;
+        }
+
+        public void setDnum(int dnum) {
+            this.dnum = dnum;
+        }
+
+        public int getBnum() {
+            return bnum;
+        }
+
+        public void setBnum(int bnum) {
+            this.bnum = bnum;
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public byte getAttribute() {
+        return attribute;
+    }
+
+    public void setAttribute(byte attribute) {
+        this.attribute = attribute;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    public int getFlag() {
+        return flag;
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
+    }
+}

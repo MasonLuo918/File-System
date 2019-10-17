@@ -1,7 +1,17 @@
 package com.system.entity;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.LinkedList;
+
+import org.omg.CORBA.PUBLIC_MEMBER;
+
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
+import com.sun.xml.internal.ws.handler.HandlerProcessor.RequestOrResponse;
 import com.system.model.Disk;
 import com.system.model.FAT;
+import com.system.model.FileManager;
 import com.system.utils.PropertyUtils;
 
 /**
@@ -198,6 +208,79 @@ public class Folder {
             }
         }
     }
+    
+    /**
+     * 创建一个文件
+     * @return
+     */
+    
+    public FileEntry createFile(String name, String fileFolder) {
+    	return createFile(name, fileFolder, false);
+    }
+    public FileEntry createFile(String name, String fileFolder, boolean readOnly) {
+		return createFile(name, fileFolder, readOnly,true);
+	}
+    public FileEntry createFile(String name, String fileFolder, boolean readOnly, boolean normal) {
+    	if(contain(name) || Full()) {
+    		return null;
+    	}
+    	FAT fat = FAT.getInstance();
+    	int index = fat.allocation();
+    	if(index == -1) {
+    		return null;
+    	}
+    	FileEntry fileEntry = new FileEntry(); // 填写文件目录
+    	fileEntry.setFolder(true);
+    	fileEntry.setName(name);
+    	fileEntry.setReadOnly(readOnly);
+    	fileEntry.setNormal(normal);
+    	fileEntry.setStartBlockIndex(index);
+    	Folder folder = new Folder(index, name);
+    	folder.addEntry(fileEntry); // 保存文件目录
+    	OpenFileTable fileOpenTable = new OpenFileTable(); // 填写已打开文件表
+    	fileOpenTable.setAttribute(fileEntry.getPropertyForByte());
+    	fileOpenTable.setName(name);
+    	OpenFile fileOpen = new OpenFile();
+    	if(fileOpen.add(fileOpenTable)) {
+    		System.out.println("文件创建成功！");
+    		return fileEntry;
+    	}
+    }
+    
+    /**
+     * 打开文件操作
+     * @return
+     */
+    public FileEntry openFile(String path, String name, String type) {
+    	String file_entry;
+    	FileEntry openFileEntry;
+    	FileManager fileCatalog = new FileManager();
+    	file_entry = fileCatalog.getFilefolder(path, name);
+    	if(contain(name) || Full()) {
+    		return null;
+    	}
+    	openFileEntry = (FileEntry) get(name);
+    	if(type.length() > 2) {
+    		return null;
+    	}
+    	if(type.equals("ow") && !openFileEntry.isReadOnly()) {
+    		return null;
+    	}
+    	OpenFile fileOpen = new OpenFile();
+    	if(fileOpen.get(name) == null) {
+    		byte attribute = openFileEntry.getPropertyForByte();
+    		OpenFileTable fileOpenTable = new OpenFileTable();
+    		fileOpenTable.setName(name);
+    		fileOpenTable.setAttribute(attribute);
+    		fileOpen.add(fileOpenTable);
+    	}
+    	return openFileEntry;
+    }
+    
+    /**
+     * 读文件
+     * @return
+     */
 
     public String getName() {
         return name;
