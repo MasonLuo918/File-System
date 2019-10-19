@@ -1,5 +1,6 @@
 package com.left_interface;
 
+import com.system.model.Disk;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -20,6 +21,7 @@ public class VirtualDiskTable implements Observer {
     private TableView virtualDiskTable ;
     //存放磁盘使用情况的表格
     private ObservableList<VirtualDisk> list;
+    private Disk disk = Disk.getInstance();
 
 
     public VirtualDiskTable(){
@@ -46,8 +48,9 @@ public class VirtualDiskTable implements Observer {
      */
     public ObservableList<VirtualDisk> bytesToList(byte[][] space){
         this.list.clear();
+        //byte[][] space = disk.getSpace();
         int index =1;
-        for (int i=0; i<space.length; i++){
+        for (int i=0; i<2; i++){
             for (int j=0; j<space[i].length; j++){
                 this.list.add(new VirtualDisk(index++, Math.abs(space[i][j]*64)));
             }

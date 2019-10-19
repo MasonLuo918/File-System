@@ -1,7 +1,12 @@
 package com.left_interface;
 
+/**
+ * @author  QTJ
+ */
 public class VirtualDisk {
+    //块号（从1开始）
     private int numberOfBlock;
+    //消耗量
     private int value;
     public VirtualDisk(int numberOfBlock, int value){
         this.numberOfBlock = numberOfBlock;
