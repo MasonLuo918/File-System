@@ -12,6 +12,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Observable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -20,6 +21,7 @@ import org.omg.CORBA.PUBLIC_MEMBER;
 
 import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 import com.sun.xml.internal.bind.v2.util.FatalAdapter;
+import com.system.common.observer.OpenFileObserver;
 import com.system.entity.OpenFileTable.Pointer;
 import com.system.model.Disk;
 import com.system.model.FAT;
@@ -268,11 +270,14 @@ public class Folder {
     	fileOpenTable.setAttribute(fileEntry.getPropertyForByte());
     	fileOpenTable.setName(name);
     	fileOpenTable.setNumber(index);
+    	fileOpenTable.setLength(fileEntry.getLength());
     	fileOpenTable.getRead().setBnum(0);
     	fileOpenTable.getRead().setDnum(index);
     	fileOpenTable.getWrite().setBnum(0);
     	fileOpenTable.getWrite().setDnum(index);
-    	OpenFile fileOpen = new OpenFile();
+    	OpenFile fileOpen = OpenFile.getInstance();
+    	OpenFileObserver tableObserver = new OpenFileObserver(); 
+		fileOpen.addObserver(tableObserver);
     	if(fileOpen.add(fileOpenTable)) {
     		System.out.println("文件创建成功！");
     		return fileEntry;
@@ -300,7 +305,7 @@ public class Folder {
     	if(type.equals("ow") && !openFileEntry.isReadOnly()) {
     		return null;
     	}
-    	OpenFile fileOpen = new OpenFile();
+    	OpenFile fileOpen = OpenFile.getInstance();
     	if(fileOpen.get(name) == null) { // 已打开文件表中没有记录，则填写已打开文件表
     		byte attribute = openFileEntry.getPropertyForByte();
     		OpenFileTable fileOpenTable = new OpenFileTable();
@@ -316,6 +321,8 @@ public class Folder {
     		}else if(type.equals("or")) {
     			fileOpenTable.setFlag(0);
     		}
+    		OpenFileObserver tableObserver = new OpenFileObserver(); 
+    		fileOpen.addObserver(tableObserver);
     		fileOpen.add(fileOpenTable);
     	}
     	return openFileEntry;
@@ -328,7 +335,7 @@ public class Folder {
     public OpenFileTable readFile(String path, String name, int length) {
     	String filename = path + '/' + name;
     	OpenFileTable fileTable;
-    	OpenFile fileOpen = new OpenFile();
+    	OpenFile fileOpen = OpenFile.getInstance();
     	int beginlength;
     	if(fileOpen.get(name) == null) { // 判断已打开文件表中是否含有该文件
     		openFile(path, name, "or");
@@ -379,7 +386,7 @@ public class Folder {
     public OpenFileTable writeFile(String path, String name, int length) {
     	String filename = path + '/' + name;
     	OpenFileTable fileTable;
-    	OpenFile fileOpen = new OpenFile();
+    	OpenFile fileOpen = OpenFile.getInstance();
     	int beginlength;
     	if(fileOpen.get(name) == null) { // 已打开文件表中没有该文件，则需先打开文件
     		openFile(path, name, "ow");
@@ -429,7 +436,7 @@ public class Folder {
     public OpenFileTable closeFile(String path,String name) {
     	String filename = path + '/' + name;
     	OpenFileTable fileTable;
-    	OpenFile fileOpen = new OpenFile();
+    	OpenFile fileOpen = OpenFile.getInstance();
     	if(fileOpen.get(name) == null) { // 判断文件是否在已打开文件表中
     		return null;
     	}
@@ -444,6 +451,8 @@ public class Folder {
     			e.printStackTrace();
     		}
     	}
+    	OpenFileObserver tableObserver = new OpenFileObserver(); 
+		fileOpen.addObserver(tableObserver);
     	if(!fileOpen.remove(name)) { // 从已打开文件表中删除文件
     		return null;
     	}
@@ -462,7 +471,7 @@ public class Folder {
     	if(contain(name) || Full()) {
     		return null;
     	}
-    	OpenFile fileOpen = new OpenFile();
+    	OpenFile fileOpen = OpenFile.getInstance();
     	if(fileOpen.get(name) != null) { // 判断已打开文件表里是否有记录该文件
     		return null;
     	}else {
@@ -488,7 +497,7 @@ public class Folder {
     	if(contain(name) || Full()) {
     		return null;
     	}
-    	OpenFile fileOpen = new OpenFile();
+    	OpenFile fileOpen = OpenFile.getInstance();
     	if(fileOpen.get(name) != null) { // 判断已打开文件表里是否有记录该文件
     		return null;
     	}
@@ -516,7 +525,7 @@ public class Folder {
     	if(contain(name) || Full()) {
     		return null;
     	}
-    	OpenFile fileOpen = new OpenFile();
+    	OpenFile fileOpen = OpenFile.getInstance();
     	if(fileOpen.get(name) != null) { // 判断已打开文件表里是否有记录该文件
     		return null;
     	}
