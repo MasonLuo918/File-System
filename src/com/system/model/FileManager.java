@@ -11,7 +11,7 @@ import com.system.entity.FolderEntry;
 public class FileManager {
 	
 	public String getFilefolder(String path, String name) {
-		String fileFolder;
+		String fileFolder = null;
 		int length = 0;
 		if (name.length() > 3) {
 			return null;
@@ -28,7 +28,7 @@ public class FileManager {
 		return fileFolder;
 	}
 
-	public FileEntry createFile(String path, String name,) {
+	public FileEntry createFile(String path, String name) {
     	String fileFolder;
     	if(name.length() > 3) {
     		return null;

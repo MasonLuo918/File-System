@@ -15,7 +15,7 @@ public class OpenFileTable {
 
     private Pointer write;
 
-    static class Pointer{
+    public static class Pointer{
         private int dnum;
 
         private int bnum;

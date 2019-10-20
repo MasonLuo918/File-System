@@ -6,6 +6,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
@@ -17,34 +18,38 @@ import java.util.Observer;
  * @author QTJ
  */
 public class VirtualDiskTable implements Observer {
-    //ç£ç›˜è¡¨
+    //´ÅÅÌ±í
     private TableView virtualDiskTable ;
-    //å­˜æ”¾ç£ç›˜ä½¿ç”¨æƒ…å†µçš„è¡¨æ ¼
+    //´æ·Å´ÅÅÌÊ¹ÓÃÇé¿öµÄ±í¸ñ
     private ObservableList<VirtualDisk> list;
     private Disk disk = Disk.getInstance();
 
-
-    public VirtualDiskTable(){
-        //åˆ›å»ºä¸€ä¸ªObservableListå®ä¾‹
+    /**
+    @param scene
+     */
+    public VirtualDiskTable(Scene scene){
+        //´´½¨Ò»¸öObservableListÊµÀı
         this.list = FXCollections.observableArrayList();
-        //ä»¥listä½œä¸ºæ•°æ®æºåˆ›å»ºä¸€ä¸ªTableViewå®ä¾‹
+        //ÒÔlist×÷ÎªÊı¾İÔ´´´½¨Ò»¸öTableViewÊµÀı
         this.virtualDiskTable = new TableView(this.list);
+        virtualDiskTable.prefHeightProperty().bind(scene.heightProperty().multiply(0.6));
+        virtualDiskTable.prefWidthProperty().bind(scene.widthProperty().multiply(0.25));
         init();
     }
 
     /**
-     * ä½†è¢«è§‚å¯Ÿè€…æ”¹åŠ¨æ—¶ï¼Œè¯¥æ–¹æ³•ä¼šè¢«è°ƒç”¨
-     * @param o  è¢«è§‚å¯Ÿå¯¹è±¡
-     * @param space è¢«è§‚å¯Ÿå¯¹è±¡ä¼ å›æ¥çš„ç£ç›˜
+     * µ«±»¹Û²ìÕß¸Ä¶¯Ê±£¬¸Ã·½·¨»á±»µ÷ÓÃ
+     * @param o  ±»¹Û²ì¶ÔÏó
+     * @param space ±»¹Û²ì¶ÔÏó´«»ØÀ´µÄ´ÅÅÌ
      */
     @Override
     public void update(Observable o, Object space){
         bytesToList((byte[][]) space);
     }
     /**
-     * å°†Byteæ•°ç»„è½¬æ¢æˆObservableList
-     * @param space ç£ç›˜
-     * @return list  ç£ç›˜çš„ObservableListå½¢å¼
+     * ½«ByteÊı×é×ª»»³ÉObservableList
+     * @param space ´ÅÅÌ
+     * @return list  ´ÅÅÌµÄObservableListĞÎÊ½
      */
     public ObservableList<VirtualDisk> bytesToList(byte[][] space){
         this.list.clear();
@@ -59,12 +64,16 @@ public class VirtualDiskTable implements Observer {
     }
 
     /**
-     * åˆå§‹åŒ–virtualDiskTableï¼Œå¹¶å¯¹listè®¾ç½®ç›‘å¬
+     * ³õÊ¼»¯virtualDiskTable£¬²¢¶ÔlistÉèÖÃ¼àÌı
      */
     public void init(){
-        TableColumn<VirtualDisk, Number> numberOfBlock = new TableColumn<VirtualDisk, Number>("å—å·");
-        TableColumn<VirtualDisk, Number> value = new TableColumn<VirtualDisk, Number>("æ¶ˆè€—å€¼");
+        TableColumn<VirtualDisk, Number> numberOfBlock = new TableColumn<VirtualDisk, Number>("¿éºÅ");
+        TableColumn<VirtualDisk, Number> value = new TableColumn<VirtualDisk, Number>("ÏûºÄÖµ");
+
+        virtualDiskTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         virtualDiskTable.getColumns().addAll(numberOfBlock, value);
+
+        //¶ÔÁĞÌî³äÊı¾İ
         numberOfBlock.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<VirtualDisk, Number>, ObservableValue<Number>>() {
             @Override
             public ObservableValue<Number> call(TableColumn.CellDataFeatures<VirtualDisk, Number> param) {

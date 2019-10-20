@@ -19,18 +19,20 @@ public class Test extends Application {
     @Override
     public void start(Stage primaryStage){
         AnchorPane root = new AnchorPane();
+        Scene scene = new Scene(root);
         Disk disk = Disk.getInstance();
-        VirtualDiskTable virtualDiskTable = new VirtualDiskTable();
+        VirtualDiskTable virtualDiskTable = new VirtualDiskTable(scene);
+        OpenFileTableView openFileTableView = new OpenFileTableView(scene);
        // disk.addObserver(virtualDiskTable);
         byte[] bytes = {1,2};
        // disk.writeBlock(1,bytes);
-        root.getChildren().add(virtualDiskTable.getVirtualDiskTable());
-        Scene scene = new Scene(root);
+        root.getChildren().addAll(virtualDiskTable.getVirtualDiskTable(), openFileTableView.getOpenFileTableVew());
+        AnchorPane.setTopAnchor(openFileTableView.getOpenFileTableVew(),500.0);
         primaryStage.setScene(scene);
+        primaryStage.setWidth(1000);
+        primaryStage.setHeight(800);
         primaryStage.show();
 
-        OpenFileTable.Point
-        OpenFileTable temp = new OpenFileTable();
-        temp.getRead().
+
     }
 }
