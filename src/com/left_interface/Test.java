@@ -1,5 +1,6 @@
 package com.left_interface;
 
+import com.system.entity.OpenFileTable;
 import com.system.model.Disk;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -27,5 +28,9 @@ public class Test extends Application {
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        OpenFileTable.Point
+        OpenFileTable temp = new OpenFileTable();
+        temp.getRead().
     }
 }
