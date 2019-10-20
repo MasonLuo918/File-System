@@ -6,6 +6,8 @@ public class OpenFileTable {
     private byte attribute;
 
     private int number;
+    
+    private int length;
 
     private int flag;
 
@@ -59,7 +61,15 @@ public class OpenFileTable {
         this.number = number;
     }
 
-    public int getFlag() {
+    public int getLength() {
+		return length;
+	}
+
+	public void setLength(int length) {
+		this.length = length;
+	}
+
+	public int getFlag() {
         return flag;
     }
 
