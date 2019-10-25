@@ -534,6 +534,71 @@ public class Folder {
     	return openFileEntry;
     }
     
+    /**
+     * 显示目录内容
+     * @return
+     */
+    public FolderEntry showContent(String path, String name) {
+    	String folder_entry;
+    	FileManager folderCatalog = new FileManager();
+    	FolderEntry folderEntry;
+    	int index;
+    	byte[] str = null;
+    	byte[][] strs = new byte[8][8];
+    	int k = 0;
+    	folder_entry = folderCatalog.getFilefolder(path, name); 
+    	if(contain(name) || Full()) { // 不存在该目录
+    		return null;
+    	}
+    	folderEntry = (FolderEntry)get(name);  // 获取该目录上级目录里对应的目录项
+    	index = folderEntry.getStartBlockIndex(); // 获取起始盘块号
+    	str = Disk.getInstance().readBlock(index); // 读取盘块内容
+    	for(int i = 0; i < str.length; i+=8) {  // 转换成8个字节为一个字节串，共8个字节串
+    		k = 0;
+    		for(int j = 0; j < 8; j++) {
+    			strs[k][j] = str[i];
+    			i++;
+    		}
+    		k++;
+    	}
+    	for(int i = 0; i < 8; i++) {
+    		FolderEntry eachCatalog = new FolderEntry(strs[i]); // 将字节串转换成entry
+    		System.out.print(eachCatalog);  // 输出每个entry（目录项）
+    	}
+    	return folderEntry;
+    }
+    
+    /**
+     * 删除空目录
+     * @return
+     */
+    public FolderEntry removeCatalog(String path, String name) {
+    	String folder_entry;
+    	FileManager folderCatalog = new FileManager();
+    	FolderEntry folderEntry;
+    	int index;
+    	byte[] str = null;
+    	if(contain(name) || Full()) { // 不存在该目录
+    		return null;
+    	}
+    	folder_entry = folderCatalog.getFilefolder(path, name);
+    	folderEntry = (FolderEntry)get(name); // 获取该目录上级目录里对应的目录项
+    	index = folderEntry.getStartBlockIndex(); // 获取起始盘块号
+    	if(index == 2) {    // 为根目录
+    		return null; 
+    	}
+    	str = Disk.getInstance().readBlock(index);
+    	if(str.length > 0) { // 目录下有文件或子目录
+    		return null;
+    	}
+    	Folder folder = new Folder(index,folder_entry);
+		if(!folder.removeEntry(folderEntry)) { // 删除目录项不成功
+			return null;
+		}
+		FAT.getInstance().collect(index); // 回收盘块
+		return folderEntry;
+    }
+    
     public String getName() {
         return name;
     }
