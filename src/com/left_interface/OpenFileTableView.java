@@ -12,7 +12,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -65,14 +64,14 @@ public class OpenFileTableView implements Observer {
         number.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<OpenFileTable, Number>, ObservableValue<Number>>() {
             @Override
             public ObservableValue<Number> call(TableColumn.CellDataFeatures<OpenFileTable, Number> param) {
-                SimpleIntegerProperty s = new SimpleIntegerProperty(param.getValue().getNumber());
+                SimpleIntegerProperty s = new SimpleIntegerProperty(param.getValue().getStartBlockNum());
                 return s;
             }
         });
         length.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<OpenFileTable, Number>, ObservableValue<Number>>() {
             @Override
             public ObservableValue<Number> call(TableColumn.CellDataFeatures<OpenFileTable, Number> param) {
-                SimpleIntegerProperty s = new SimpleIntegerProperty(param.getValue().getNumber());
+                SimpleIntegerProperty s = new SimpleIntegerProperty(param.getValue().getStartBlockNum());
                 return s;
             }
         });

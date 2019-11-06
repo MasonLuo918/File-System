@@ -70,6 +70,7 @@ public class FAT {
             }
             index = emptyBlockIndexList.removeFirst();
             table[lastBlockIndex] = (byte) index;
+            table[index] = -1;
             persistFAT();
             return index;
         }
@@ -105,6 +106,11 @@ public class FAT {
             }
         }
     }
+
+    public int getContent(int index){
+        return table[index];
+    }
+
     /**
      * ´Ó´ÅÅÌ¿éÖĞ¼ÓÔØfat
      * @param disk ´ÅÅÌ¿é

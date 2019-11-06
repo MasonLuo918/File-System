@@ -33,6 +33,5 @@ public class Test extends Application {
         primaryStage.setHeight(800);
         primaryStage.show();
 
-
     }
 }

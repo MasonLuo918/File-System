@@ -106,7 +106,6 @@ public class Disk extends Observable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println();
     }
     /**
      * 从一个文件加载磁盘
@@ -137,6 +136,7 @@ public class Disk extends Observable {
             readLock.unlock();
         }
     }
+
     /**
      * 写一个磁盘块
      * @param index 索引值
@@ -259,6 +259,5 @@ public class Disk extends Observable {
 
     public static void main(String[] args) throws FileNotFoundException {
         Disk disk = Disk.getInstance();
-        System.out.println();
     }
 }

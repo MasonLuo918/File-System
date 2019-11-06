@@ -1,5 +1,6 @@
 package com.system.entity;
 
+// TODO 重命名
 public abstract class Entry {
     // 文件名
     String name;
@@ -9,7 +10,7 @@ public abstract class Entry {
     protected boolean system = false;
     // 普通文件
     private boolean normal = false;
-    // 文件或者目录
+    // 文件或者目录e
     private boolean folder = false;
     //起始盘符
     int startBlockIndex;
